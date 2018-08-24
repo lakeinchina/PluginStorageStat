@@ -106,7 +106,7 @@ def appboxPluginNum(globalData):
     for (k, v) in globalData.items():
         tot = 0
         for info in v['PluginInfo']:
-            if (info['installState'] == 'none'):
+            if (info['installState'] != 'none'):
                 tot += 1
         percents.append(tot)
 
