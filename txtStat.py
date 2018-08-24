@@ -31,7 +31,8 @@ def phoneTotalSize(globalData):
     for (k, v) in globalData.items():
         percent = v['StorageInfo']['systemTotal']
         percentint = int(percent / 1073741824)
-        # print(percentint)
+        # if(percentint>100):
+        #     print(percentint," ",k," ",v)
         percents.append(percentint)
 
     result = np.histogram(percents, 26, [0, 130], density=True)
@@ -164,8 +165,35 @@ def appboxPluginPackageSizeList(globalData):
             # print(percentint)
 
     result = sorted(percents.items(), key=lambda d: d[1], reverse=True)
-    resultString =  "插件所有用户占用存储空间之和 大小分布，单位MB,数量=" + str(len(percents)) + "\n"
-    for (k,v) in result:
-        resultString += k+" "+str(int(v/1048576))+"\n"
+    resultString = "插件所有用户占用存储空间之和 大小分布，单位MB,数量=" + str(len(percents)) + "\n"
+    for (k, v) in result:
+        resultString += k + " " + str(int(v / 1048576)) + "\n"
     return resultString
-    # print(percents)
+
+
+# 闪电盒子type占用存储空间大小分布
+def appboxTotalTypeSize(globalData, type):
+    percents = []
+    for (k, v) in globalData.items():
+        tot = 0
+        if type == 'self':
+            tot = v['StorageInfo']['selfUsed']
+        else:
+            for info in v['PluginInfo']:
+                if info['installState'] == type:
+                    tot += info['apkSizeByte'] + info['dataSizeByte'] + info['sdcardSizeByte'] + info['dalvikCacheSizeByte']
+        percentint = int(tot / 1048576)
+        # print(percentint)
+        percents.append(percentint)
+
+    result = np.histogram(percents, 40, [0, 10000], density=True)
+    # print(result)
+    r = result[0] * 250
+    resultString = "闪电盒子type=" + type + "占用存储空间大小分布，单位MB,样本数量" + str(len(percents)) + "\n"
+    i = 0
+    for p in r:
+        # resultString += str(resultString) + result[1][i] + "%-" + result[1][i + 1] + " " + p
+        resultString += str.format('{}-{} {:.4f}\n', int(result[1][i]), int(result[1][i + 1]), p)
+        i += 1
+
+    return resultString
